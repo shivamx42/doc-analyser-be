@@ -1,12 +1,12 @@
-# app/routers/upload.py
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from app.schemas import UploadResponse
 
 router = APIRouter()
 
 ALLOWED_TYPES = ["application/pdf", "text/plain"]
 MAX_SIZE_MB = 100
 
-@router.post("/upload")
+@router.post("/upload", response_model=UploadResponse)
 async def upload_file(file: UploadFile = File(...)):
 
     if file.content_type not in ALLOWED_TYPES:
