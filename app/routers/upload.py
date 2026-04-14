@@ -33,5 +33,4 @@ async def upload_file(file: UploadFile = File(...)):
         filename=file.filename,
         size_mb=size_mb,
         content_type=file.content_type,
-        total_pages=extraction.total_pages,
     )

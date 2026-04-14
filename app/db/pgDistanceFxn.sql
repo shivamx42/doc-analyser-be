@@ -7,7 +7,6 @@ returns table(
     id uuid,
     document_id uuid,
     content text,
-    page_number int,
     similarity float
 )
 language plpgsql
@@ -18,7 +17,6 @@ begin
         c.id,
         c.document_id,
         c.content,
-        c.page_number,
         1 - (c.embedding <=> query_embedding) as similarity
     from chunks c
     where

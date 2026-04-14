@@ -1,11 +1,9 @@
 import fitz
 from dataclasses import dataclass
 
-from numpy import byte
 
 @dataclass
 class ExtractedPage:
-    page_number: int
     text: str
 
 @dataclass
@@ -22,7 +20,7 @@ def extract_from_pdf(content: bytes) -> ExtractionResult:
         page = doc[page_num]
         text = page.get_text()
         if(text.strip()):  # Only add pages that have text(that is skipping blank pages and pages with only images)
-            pages.append(ExtractedPage(page_number=page_num+1, text=text))
+            pages.append(ExtractedPage(text=text))
 
     doc.close()
 
@@ -30,7 +28,7 @@ def extract_from_pdf(content: bytes) -> ExtractionResult:
 
 def extract_from_txt(content: bytes) -> ExtractionResult:
     text = content.decode("utf-8")
-    pages=[ExtractedPage(page_number=1, text=text)]
+    pages=[ExtractedPage(text=text)]
     
     return ExtractionResult(pages=pages, total_pages=1)
 

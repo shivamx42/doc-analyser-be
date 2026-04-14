@@ -11,7 +11,6 @@ create table chunks (
     document_id uuid references documents(id) on delete cascade,
     content text not null,
     embedding vector(384),
-    page_number int,
     chunk_index int,
     created_at timestamp default now()
 );
