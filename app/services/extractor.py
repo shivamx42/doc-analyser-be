@@ -3,12 +3,8 @@ from dataclasses import dataclass
 
 
 @dataclass
-class ExtractedPage:
-    text: str
-
-@dataclass
 class ExtractionResult:
-    pages: list[ExtractedPage]
+    pages: list[str]
     total_pages: int
 
 def extract_from_pdf(content: bytes) -> ExtractionResult:
@@ -20,7 +16,7 @@ def extract_from_pdf(content: bytes) -> ExtractionResult:
         page = doc[page_num]
         text = page.get_text()
         if(text.strip()):  # Only add pages that have text(that is skipping blank pages and pages with only images)
-            pages.append(ExtractedPage(text=text))
+            pages.append(text)
 
     doc.close()
 
@@ -28,7 +24,7 @@ def extract_from_pdf(content: bytes) -> ExtractionResult:
 
 def extract_from_txt(content: bytes) -> ExtractionResult:
     text = content.decode("utf-8")
-    pages=[ExtractedPage(text=text)]
+    pages=[text]
     
     return ExtractionResult(pages=pages, total_pages=1)
 
