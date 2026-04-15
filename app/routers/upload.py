@@ -3,7 +3,7 @@ from app.schemas import UploadResponse
 from app.services.extractor import extract
 from app.services.chunker import chunk_text
 from app.services.embedder import generate_embeddings
-from app.services.supabaseStorage import store_chunks, store_document
+from app.services.supabaseStore import store_chunks, store_document
 
 router = APIRouter()
 
