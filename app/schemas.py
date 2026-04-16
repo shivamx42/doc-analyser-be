@@ -20,4 +20,5 @@ class ChunkResult(BaseModel):
 
 class QueryResponse(BaseModel):
     question: str
+    answer: str
     results: list[ChunkResult]
