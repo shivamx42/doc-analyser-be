@@ -50,3 +50,13 @@ class DocumentListResponse(BaseModel):
 class AuthenticatedUser(BaseModel):
     id: UUID
     email: Optional[str] = None
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class LoginResponse(BaseModel):
+    access_token: str
+    refresh_token: str
+    user_id: str
+    email: str
