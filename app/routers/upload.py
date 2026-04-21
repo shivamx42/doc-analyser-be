@@ -1,9 +1,10 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.schemas import UploadResponse
+from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
+from app.pydanticModels import UploadResponse, AuthenticatedUser
 from app.services.extractor import extract
 from app.services.chunker import chunk_text
 from app.services.embedder import generate_embeddings
 from app.services.supabaseStore import store_chunks, store_document
+from app.services.authService import get_current_user
 
 router = APIRouter()
 
@@ -11,7 +12,10 @@ ALLOWED_TYPES = ["application/pdf", "text/plain"]
 MAX_SIZE_MB = 100
 
 @router.post("/upload", response_model=UploadResponse)
-async def upload_file(file: UploadFile = File(...)):
+async def upload_file(
+    file: UploadFile = File(...),
+    current_user: AuthenticatedUser = Depends(get_current_user),
+):
 
     if file.content_type not in ALLOWED_TYPES:
         raise HTTPException(status_code=400, detail="Only PDF and TXT files allowed")
@@ -39,6 +43,7 @@ async def upload_file(file: UploadFile = File(...)):
     embeddings = generate_embeddings(chunks)
 
     document_id = store_document(
+        owner_id=str(current_user.id),
         filename=file.filename,
         content_type=file.content_type,
         total_pages=extraction.total_pages
