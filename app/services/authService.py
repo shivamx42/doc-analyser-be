@@ -180,3 +180,24 @@ def login_user(payload: LoginRequest) -> LoginResponse:
         "user_id": str(user.id),
         "email": user.email,
     }
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme)) -> AuthenticatedUser:
+    if credentials is None or not credentials.credentials.strip():
+        raise HTTPException(401, "Authentication required")
+
+    try:
+        auth_response = supabase.auth.get_user(credentials.credentials)
+    except ConnectError as error:
+        raise HTTPException(502, "Could not validate token") from error
+    except Exception as error:
+        _handle_auth_validation_error(error)
+
+    user = getattr(auth_response, "user", None)
+    if user is None:
+        raise HTTPException(401, "Invalid or expired access token")
+
+    return AuthenticatedUser(
+        id=user.id,
+        email=getattr(user, "email", None),
+    )
