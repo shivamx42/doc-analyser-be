@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from httpx import ConnectError
 
-from app.db.supabaseClient import supabase
+from app.db.supabaseClient import supabase , supabase_admin
 from app.pydanticModels import AuthenticatedUser, LoginRequest, LoginResponse, RegisterRequest, RegisterResponse
 
 EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -116,7 +116,7 @@ def register_user(payload: RegisterRequest) -> RegisterResponse:
     email, password, display_name = _validate_register_payload(payload)
 
     try:
-        auth_response = supabase.auth.admin.create_user({
+        auth_response = supabase_admin.auth.admin.create_user({
             "email": email,
             "password": password,
             "email_confirm": True,
