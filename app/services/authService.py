@@ -179,6 +179,7 @@ def login_user(payload: LoginRequest) -> LoginResponse:
         "refresh_token": session.refresh_token,
         "user_id": str(user.id),
         "email": user.email,
+        "display_name": user.user_metadata.get("display_name")
     }
 
 def get_current_user(

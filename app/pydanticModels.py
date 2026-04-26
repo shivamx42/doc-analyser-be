@@ -58,5 +58,6 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     refresh_token: str
+    display_name: str
     user_id: str
     email: str
