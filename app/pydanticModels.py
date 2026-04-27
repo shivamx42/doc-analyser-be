@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
@@ -11,7 +11,7 @@ class UploadResponse(BaseModel):
 
 class QueryRequest(BaseModel):
     question: str
-    document_id: Optional[UUID] = None
+    document_ids: list[UUID] = Field(default_factory=list)
 
 class ChunkResult(BaseModel):
     id: UUID

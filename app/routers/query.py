@@ -15,14 +15,16 @@ async def get_results_from_query(
     if not request.question.strip():
         raise HTTPException(status_code=400, detail="Question cannot be empty")
 
-    if request.document_id is not None:
-        owned_documents = list_user_documents(str(current_user.id))
-        owned_document = next(
-            (document for document in owned_documents if document["id"] == str(request.document_id)),
-            None,
-        )
+    if len(request.document_ids) > 20:
+        raise HTTPException(status_code=400, detail="You can search up to 20 documents at a time")
 
-        if owned_document is None:
+    selected_document_ids = [str(document_id) for document_id in request.document_ids]
+
+    if selected_document_ids:
+        owned_documents = list_user_documents(str(current_user.id))
+        owned_document_ids = {document["id"] for document in owned_documents}
+
+        if any(document_id not in owned_document_ids for document_id in selected_document_ids):
             raise HTTPException(status_code=404, detail="Document not found")
 
     question_embedding = generate_embeddings([request.question])[0]
@@ -30,7 +32,7 @@ async def get_results_from_query(
     raw_results = search_chunks(
         query_embedding=question_embedding,
         owner_id=str(current_user.id),
-        document_id=str(request.document_id) if request.document_id is not None else None
+        document_ids=selected_document_ids or None
     )
 
     if not raw_results:
