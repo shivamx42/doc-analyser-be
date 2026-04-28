@@ -45,3 +45,19 @@ def search_chunks(owner_id: str, query_embedding: list[float], document_ids: Opt
     }).execute()
 
     return result.data or []
+
+def delete_user_document(owner_id: str, document_id: str) -> bool:
+    existing_document = (
+        supabase.table("documents")
+        .select("id")
+        .eq("id", document_id)
+        .eq("owner_id", owner_id)
+        .limit(1)
+        .execute()
+    )
+
+    if not existing_document.data:
+        return False
+
+    supabase.table("documents").delete().eq("id", document_id).eq("owner_id", owner_id).execute()
+    return True

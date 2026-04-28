@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import upload, query, auth
+from app.routers import upload, query, auth, deleteDocument
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import getDocuments
 
@@ -17,6 +17,7 @@ app.include_router(upload.router, prefix="/api")
 app.include_router(query.router, prefix="/api")
 app.include_router(auth.router, prefix="/api")
 app.include_router(getDocuments.router, prefix="/api")
+app.include_router(deleteDocument.router, prefix="/api")
 
 @app.get("/")
 def home():

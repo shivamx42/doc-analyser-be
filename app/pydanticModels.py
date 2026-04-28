@@ -61,3 +61,7 @@ class LoginResponse(BaseModel):
     display_name: str
     user_id: str
     email: str
+
+class DeleteDocumentResponse(BaseModel):
+    document_id: UUID
+    message: str
