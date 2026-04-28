@@ -9,7 +9,7 @@ from app.services.authService import get_current_user
 router = APIRouter()
 
 ALLOWED_TYPES = ["application/pdf", "text/plain"]
-MAX_SIZE_MB = 100
+MAX_SIZE_MB = 10
 
 @router.post("/upload", response_model=UploadResponse)
 async def upload_file(
