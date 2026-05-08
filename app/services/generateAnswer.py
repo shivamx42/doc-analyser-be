@@ -21,18 +21,25 @@ def generate_answer(question: str, chunks: list[dict]) -> str:
         raise RuntimeError("GROQ Model is not set")
 
     context = build_context(chunks)
+    system_prompt = """You are a precise AI assistant answering questions from  retrieved documents.
+
+        Rules:
+        1. Use ONLY the provided documents.
+        2. If the answer is not contained in the documents, say:
+        "I could not find this information in the provided documents."
+        3. Do not invent facts.
+        4. Keep answers concise but complete.
+        5. Prefer direct answers over long explanations.
+        6. If multiple sources disagree, mention the disagreement.
+        7. Use clear formatting with paragraphs and bullet points when useful.
+        8. Never mention source numbers or the existence of context/document chunks."""
 
     payload = {
         "model": GROQ_MODEL,
         "messages": [
             {
                 "role": "system",
-                "content": (
-                    "You answer questions using only the provided document context. "
-                    "If the answer is not in the context, say so clearly. "
-                    "Do not make up facts. "
-                    "Do not mention the source numbers in your answer, but use them to determine the answer based on the context."
-                ),
+                "content": system_prompt,
             },
             {
                 "role": "user",

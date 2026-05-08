@@ -35,7 +35,7 @@ def list_user_documents(owner_id: str) -> list[dict]:
 
     return result.data or []
 
-def search_chunks(owner_id: str, query_embedding: list[float], document_ids: Optional[list[str]] = None, match_count: int = 3, min_similarity: float = 0.3) -> list[dict]:
+def search_chunks(owner_id: str, query_embedding: list[float], document_ids: Optional[list[str]] = None, match_count: int = 5, min_similarity: float = 0.3) -> list[dict]:
     result = supabase.rpc("match_chunks", {
         "query_embedding": query_embedding,
         "match_count": match_count,

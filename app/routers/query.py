@@ -15,8 +15,8 @@ async def get_results_from_query(
     if not request.question.strip():
         raise HTTPException(status_code=400, detail="Question cannot be empty")
 
-    if len(request.document_ids) > 20:
-        raise HTTPException(status_code=400, detail="You can search up to 20 documents at a time")
+    if len(request.document_ids) > 10:
+        raise HTTPException(status_code=400, detail="You can search up to 10 documents at a time")
 
     selected_document_ids = [str(document_id) for document_id in request.document_ids]
 
