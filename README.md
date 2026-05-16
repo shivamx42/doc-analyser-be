@@ -2,6 +2,11 @@
 
 This backend powers the document analysis workflow for **Doc Analyser**.
 It exposes a FastAPI API that lets authenticated users upload documents, store vector embeddings, search the most relevant chunks, and generate grounded answers from the uploaded content.
+...
+### Live Deployment
+- **Swagger UI**: [https://doc-analyser.duckdns.org/docs](https://doc-analyser.duckdns.org/docs)
+- **Frontend**: [docanalyser.netlify.app](https://docanalyser.netlify.app)
+
 
 ## What This Backend Does
 
@@ -13,6 +18,8 @@ It exposes a FastAPI API that lets authenticated users upload documents, store v
 - Stores document metadata and chunks in Supabase.
 - Retrieves the most relevant chunks for a user question using PostgreSQL vector similarity.
 - Sends the retrieved context to Groq to generate a final answer.
+- **Generates shareable public links** for specific document subsets, allowing unauthenticated querying.
+
 
 ## Main Request Flow
 
@@ -77,6 +84,19 @@ Relevant files:
 - `app/routers/deleteDocument.py`
 - `app/services/supabaseStore.py`
 
+### 5. Document Sharing (Public)
+
+Users can generate a unique token for a selection of documents. Anyone with the token can query those documents without an account.
+
+- `GET /api/share/{token}`: Get share metadata (owner name, document names).
+- `POST /api/share/{token}/query`: Query the shared documents.
+
+Relevant files:
+
+- `app/routers/share.py`
+- `app/services/supabaseStore.py`
+
+
 ## Project Structure
 
 ```text
@@ -92,7 +112,9 @@ backend/
       query.py               # question-answering endpoint
       getDocuments.py        # list uploaded documents
       deleteDocument.py      # delete a document
+      share.py               # generate and handle public share links
     services/
+
       authService.py         # auth validation and Supabase auth logic
       extractor.py           # PDF/TXT extraction and OCR fallback
       chunker.py             # chunking logic
