@@ -35,7 +35,7 @@ def list_user_documents(owner_id: str) -> list[dict]:
 
     return result.data or []
 
-def search_chunks(owner_id: str, query_embedding: list[float], document_ids: Optional[list[str]] = None, match_count: int = 5, min_similarity: float = 0.3) -> list[dict]:
+def search_chunks(query_embedding: list[float], owner_id: Optional[str] = None, document_ids: Optional[list[str]] = None, match_count: int = 5, min_similarity: float = 0.3) -> list[dict]:
     result = supabase.rpc("match_chunks", {
         "query_embedding": query_embedding,
         "match_count": match_count,
@@ -61,3 +61,31 @@ def delete_user_document(owner_id: str, document_id: str) -> bool:
 
     supabase.table("documents").delete().eq("id", document_id).eq("owner_id", owner_id).execute()
     return True
+
+def create_shared_link(owner_id: str, owner_name: str, document_ids: list[str], token: str) -> dict:
+    result = supabase.table("shared_links").insert({
+        "owner_id": owner_id,
+        "owner_name": owner_name,
+        "document_ids": document_ids,
+        "token": token
+    }).execute()
+    return result.data[0]
+
+def get_shared_link_by_token(token: str) -> Optional[dict]:
+    result = (
+        supabase.table("shared_links")
+        .select("*")
+        .eq("token", token)
+        .limit(1)
+        .execute()
+    )
+    return result.data[0] if result.data else None
+
+def get_documents_by_ids(document_ids: list[str]) -> list[dict]:
+    result = (
+        supabase.table("documents")
+        .select("id, filename")
+        .in_("id", document_ids)
+        .execute()
+    )
+    return result.data or []
