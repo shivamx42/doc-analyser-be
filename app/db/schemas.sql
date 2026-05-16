@@ -24,3 +24,12 @@ create table chunks (
     chunk_index int,
     created_at timestamp default now()
 );
+
+create table shared_links (
+    id uuid primary key default gen_random_uuid(),
+    token text not null unique,
+    owner_id uuid not null references auth.users(id) on delete cascade,
+    owner_name text not null,
+    document_ids uuid[] not null,
+    created_at timestamp default now()
+);

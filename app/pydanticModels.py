@@ -50,6 +50,7 @@ class DocumentListResponse(BaseModel):
 class AuthenticatedUser(BaseModel):
     id: UUID
     email: Optional[str] = None
+    display_name: Optional[str] = None
 
 class LoginRequest(BaseModel):
     email: str
@@ -65,3 +66,17 @@ class LoginResponse(BaseModel):
 class DeleteDocumentResponse(BaseModel):
     document_id: UUID
     message: str
+
+class ShareRequest(BaseModel):
+    document_ids: list[UUID]
+
+class ShareResponse(BaseModel):
+    token: str
+    share_url: str
+
+class SharedLinkInfo(BaseModel):
+    document_names: list[str]
+    owner_name: Optional[str] = None
+
+class SharedQueryRequest(BaseModel):
+    question: str

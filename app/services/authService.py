@@ -201,4 +201,5 @@ def get_current_user(
     return AuthenticatedUser(
         id=user.id,
         email=getattr(user, "email", None),
+        display_name=user.user_metadata.get("display_name")
     )
