@@ -2,10 +2,11 @@
 
 This backend powers the files analysis workflow for **FILE INSIGHT**.
 It exposes a FastAPI API that lets authenticated users upload documents, store vector embeddings, search the most relevant chunks, and generate grounded answers from the uploaded content.
-...
+
 ### Live Deployment
 - **Swagger UI**: [https://file-insight.duckdns.org/docs](https://file-insight.duckdns.org/docs)
-- **Frontend**: [https://file-insight.netlify.app](https://file-insight.netlify.app)
+- **Frontend**: [https://file-insight.netlify.app](https://file-insight.netlify.app)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;[Frontend Repository](https://github.com/shivamx42/doc-analyser-fe) 
 
 
 ## What This Backend Does
