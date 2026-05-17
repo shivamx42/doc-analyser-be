@@ -42,6 +42,7 @@ class DocumentListItem(BaseModel):
     filename: str
     content_type: str
     total_pages: int
+    type: str
     created_at: datetime
 
 class DocumentListResponse(BaseModel):

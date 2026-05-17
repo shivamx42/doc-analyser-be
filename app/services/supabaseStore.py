@@ -2,12 +2,13 @@ from typing import Optional
 
 from app.db.supabaseClient import supabase
 
-def store_document(owner_id: str, filename: str, content_type: str, total_pages: int) -> str:
+def store_document(owner_id: str, filename: str, content_type: str, total_pages: int, doc_type: str) -> str:
     result = supabase.table("documents").insert({
         "owner_id": owner_id,
         "filename": filename,
         "content_type": content_type,
-        "total_pages": total_pages
+        "total_pages": total_pages,
+        "type": doc_type
     }).execute()
 
     return result.data[0]["id"]
@@ -27,7 +28,7 @@ def store_chunks(document_id: str, chunks: list[str], embeddings: list[list[floa
 def list_user_documents(owner_id: str) -> list[dict]:
     result = (
         supabase.table("documents")
-        .select("id, filename, content_type, total_pages, created_at")
+        .select("id, filename, content_type, total_pages, type, created_at")
         .eq("owner_id", owner_id)
         .order("created_at", desc=True)
         .execute()

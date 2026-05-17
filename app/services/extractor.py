@@ -2,7 +2,9 @@ import fitz
 from dataclasses import dataclass
 from PIL import Image
 import io
+import os
 import pytesseract
+from app.services.transcriber import transcribe_audio
 
 
 @dataclass
@@ -44,8 +46,22 @@ def extract_from_txt(content: bytes) -> ExtractionResult:
     
     return ExtractionResult(pages=pages, total_pages=1)
 
+def is_audio_or_video(content_type: str) -> bool:
+    return (
+        content_type.startswith("audio/") 
+        or content_type.startswith("video/")
+    )
+
 def extract(content: bytes, content_type: str) -> ExtractionResult:
+    if is_audio_or_video(content_type):
+        text = transcribe_audio(content, content_type)
+        if not text.strip():
+            raise ValueError("No speech or audio content could be transcribed from the uploaded file.")
+        return ExtractionResult(pages=[text], total_pages=1)
+
     if content_type == "application/pdf":
         return extract_from_pdf(content)
     elif content_type == "text/plain":
         return extract_from_txt(content)
+    else:
+        raise ValueError(f"Unsupported file type or format: {content_type}")

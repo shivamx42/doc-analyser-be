@@ -4,6 +4,7 @@ create table documents (
     filename text not null,
     content_type text not null,
     total_pages int not null,
+    type text not null,
     created_at timestamp default now()
 );
 
