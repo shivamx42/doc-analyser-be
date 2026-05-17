@@ -1,21 +1,22 @@
 # Backend Overview
 
-This backend powers the document analysis workflow for **Doc Analyser**.
+This backend powers the files analysis workflow for **FILE INSIGHT**.
 It exposes a FastAPI API that lets authenticated users upload documents, store vector embeddings, search the most relevant chunks, and generate grounded answers from the uploaded content.
 ...
 ### Live Deployment
-- **Swagger UI**: [https://doc-analyser.duckdns.org/docs](https://doc-analyser.duckdns.org/docs)
-- **Frontend**: [docanalyser.netlify.app](https://docanalyser.netlify.app)
+- **Swagger UI**: [https://file-insight.duckdns.org/docs](https://file-insight.duckdns.org/docs)
+- **Frontend**: [https://file-insight.netlify.app](https://file-insight.netlify.app)
 
 
 ## What This Backend Does
 
-- Accepts `PDF` and `TXT` uploads.
+- Accepts `PDF`, `TXT`, and supported `Audio` & `Video` uploads.
 - Extracts document text.
 - Falls back to OCR for image-only PDFs.
-- Splits text into smaller chunks for semantic search.
+- Transcribes speech from audio/video files using the Groq Speech-to-Text API.
+- Splits text (extracted or transcribed) into smaller chunks for semantic search.
 - Generates embeddings with `sentence-transformers`.
-- Stores document metadata and chunks in Supabase.
+- Stores document metadata, chunks, and embeddings in Supabase (tagging files with type `doc`, `audio`, or `video`).
 - Retrieves the most relevant chunks for a user question using PostgreSQL vector similarity.
 - Sends the retrieved context to Groq to generate a final answer.
 - **Generates shareable public links** for specific document subsets, allowing unauthenticated querying.
@@ -29,17 +30,18 @@ It exposes a FastAPI API that lets authenticated users upload documents, store v
 
 The upload route:
 
-- validates the file type and size
-- extracts text from the file
-- chunks the extracted text
+- validates the file type and size (supports PDF, TXT, and audio/video up to 10MB)
+- extracts text from the file (handles PDF text, OCR fallback, or Groq Speech-to-Text transcription for audio/video)
+- chunks the extracted/transcribed text
 - generates embeddings for each chunk
-- stores the document record in `documents`
+- stores the document record in `documents` (saving document type as `doc`, `audio`, or `video`)
 - stores chunk content and embeddings in `chunks`
 
 Relevant files:
 
 - `app/routers/upload.py`
 - `app/services/extractor.py`
+- `app/services/transcriber.py`
 - `app/services/chunker.py`
 - `app/services/embedder.py`
 - `app/services/supabaseStore.py`
@@ -114,9 +116,9 @@ backend/
       deleteDocument.py      # delete a document
       share.py               # generate and handle public share links
     services/
-
       authService.py         # auth validation and Supabase auth logic
       extractor.py           # PDF/TXT extraction and OCR fallback
+      transcriber.py         # Groq audio/video transcription
       chunker.py             # chunking logic
       embedder.py            # sentence-transformer embeddings
       supabaseStore.py       # DB reads/writes
@@ -132,7 +134,7 @@ backend/
 The backend relies on three main tables:
 
 - `profiles`: stores user display names
-- `documents`: stores uploaded document metadata
+- `documents`: stores uploaded document metadata, including a `type` column (`doc`, `audio`, or `video`)
 - `chunks`: stores chunk text and `vector(384)` embeddings
 
 `match_chunks(...)` in `app/db/pgDistanceFxn.sql` performs similarity search by:
@@ -151,6 +153,7 @@ The backend expects these values:
 - `SUPABASE_KEY`
 - `GROQ_API_KEY`
 - `GROQ_MODEL`
+- `GROQ_SPEECH_MODEL`     # e.g., whisper-large-v3-turbo for transcribing audio/video uploads
 
 
 ## Run Locally
@@ -170,6 +173,9 @@ http://127.0.0.1:8000/
 ## Important Notes
 
 - PDF extraction first uses embedded text, then OCR if no text is found.
+- Audio and video files are transcribed to text using the Groq Whisper Speech-to-Text API before chunking and embedding.
+- Supported audio/video formats/extensions: `.mp3`, `.mp4`, `.mpeg`, `.mpga`, `.m4a`, `.ogg`, `.wav`, `.webm`, `.flac`.
+- File size limit is 10MB for all documents and media.
 - Embeddings are generated with `all-MiniLM-L6-v2`, which matches the `vector(384)` schema.
 - Authorization is enforced per user before document search or deletion.
 - The answer generator is instructed to stay grounded in the retrieved document content.
